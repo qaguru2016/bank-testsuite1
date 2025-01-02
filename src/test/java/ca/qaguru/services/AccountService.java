@@ -4,6 +4,7 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -43,6 +44,21 @@ public class AccountService {
                 .statusCode(HttpStatus.SC_OK)
                 .body("id",equalTo(id))
                 .body("accountHolderName",is(requestBody.get("accountHolderName")))
-                .body("balance", is(((Integer)requestBody.get("balance")).floatValue()));
+                .body("balance", is(((Number)requestBody.get("balance")).floatValue()));
+    }
+
+    public void deposit(int id, float depositAmt) {
+        Map<String,Object> requestBody = new HashMap<>();
+        requestBody.put("amount",depositAmt);
+
+        given()
+                .spec(requestSpecification)
+                .body(requestBody)
+                .when()
+                .put("/deposit/"+id)
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK);
     }
 }
