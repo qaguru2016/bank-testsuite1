@@ -7,7 +7,9 @@ import io.restassured.response.ValidatableResponse;
 import org.apache.http.HttpStatus;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -67,5 +69,21 @@ public class BankingTests extends TestBase {
         //Verify balance
         requestBody.put("balance",((Number)requestBody.get("balance")).floatValue()-withdrawalAmt);
         accountService.getAccountById(id,requestBody);
+    }
+    @Test
+    public void getAllAccounts(){
+        Faker faker = new Faker();
+        int count = 3;
+        List<Map<String,Object>> requestBodies = new ArrayList<>();
+        AccountService accountService = new AccountService(requestSpecification);
+        for(int i =0; i<3;i++){
+            Map<String,Object> requestBody = new HashMap<>();
+            requestBody.put("accountHolderName",faker.name().firstName());
+            requestBody.put("balance",faker.number().randomDouble(2,1000,50000));
+            int id = accountService.addAccount(requestBody);
+            requestBody.put("id", id);
+            requestBodies.add(requestBody);
+        }
+        accountService.getAllAccounts(requestBodies);
     }
 }

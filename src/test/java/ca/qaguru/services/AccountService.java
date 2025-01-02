@@ -4,12 +4,15 @@ import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.testng.Assert.assertTrue;
 
 public class AccountService {
     private RequestSpecification requestSpecification;
@@ -75,5 +78,28 @@ public class AccountService {
                 .log().all()
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK);
+    }
+
+    public void getAllAccounts(List<Map<String, Object>> expAccounts) {
+        ValidatableResponse validatableResponse =
+        given()
+                .spec(requestSpecification)
+                .when()
+                .get()
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK);
+
+        List<Map<String,Object>> response = validatableResponse.extract().body().as(ArrayList.class);
+        for (Map<String,Object> map : response){
+            if(map.containsKey("id") && map.get("id") instanceof Double){
+                //Replace the Double value with int
+                Double id = (Double) map.get("id");
+                map.put("id",id.intValue());
+            }
+        }
+        expAccounts.forEach(acc->assertTrue(response.contains(acc),"Account not present :" + acc));
+
     }
 }
