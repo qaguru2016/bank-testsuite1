@@ -61,4 +61,19 @@ public class AccountService {
                 .assertThat()
                 .statusCode(HttpStatus.SC_OK);
     }
+
+    public void withdraw(int id, float withdrawalAmt) {
+        Map<String,Object> requestBody = new HashMap<>();
+        requestBody.put("amount",withdrawalAmt);
+
+        given()
+                .spec(requestSpecification)
+                .body(requestBody)
+                .when()
+                .put("/withdraw/"+id)
+                .then()
+                .log().all()
+                .assertThat()
+                .statusCode(HttpStatus.SC_OK);
+    }
 }
